@@ -20,6 +20,21 @@ engine = create_engine("postgresql+psycopg2://postgres:1006@localhost/postgres")
 class Base(DeclarativeBase):
     pass
 
+# Faris
+class Doctor(Base):
+    __tablename__ = "Doctor"
+    
+    dID: Mapped[int] = mapped_column(Integer, primary_key=True)
+    dPhoneNum: Mapped[str] = mapped_column(String(20))
+    dName: Mapped[str] = mapped_column(String(100))
+    dFirstName: Mapped[str] = mapped_column(String(55))
+    dMiddleName: Mapped[str] = mapped_column(String(55))
+    dLastName: Mapped[str] = mapped_column(String(55))
+    
+    prescriptions: Mapped[List["Prescription"]] = relationship(
+        back_populates="doctor", cascade="all, delete-orphan"
+    )
+
 #Karolina
 class Pharmacist(Base):
     __tablename__ = "Pharmacist"
@@ -81,11 +96,21 @@ prescriptions_entries = [
     Prescription(presID=1014, dateIssued=datetime.strptime('2025-03-11', '%Y-%m-%d').date(), patientID=5, dID=5, pharmacistID=3),
 ]
 
+# Faris
+doctors_entries = [
+    Doctor(dID=1, dPhoneNum='312-000-1111', dName='Dr. John Smith', dFirstName='John', dMiddleName='Mark', dLastName='Smith'),
+    Doctor(dID=2, dPhoneNum='312-000-2222', dName='Dr. Sarah Lee', dFirstName='Sarah', dMiddleName='Alen', dLastName='Lee'),
+    Doctor(dID=3, dPhoneNum='312-000-3333', dName='Dr. Amir Khan', dFirstName='Amir', dMiddleName='Zain', dLastName='Khan'),
+    Doctor(dID=4, dPhoneNum='312-000-4444', dName='Dr. Emily Chen', dFirstName='Emily', dMiddleName='Rey', dLastName='Chen'),
+    Doctor(dID=5, dPhoneNum='312-000-5555', dName='Dr. David Park', dFirstName='David', dMiddleName='Tom', dLastName='Park'),
+]
+
 
 #Insert Data
 with Session(engine) as session:
     session.add_all(pharmacists_entries)
     session.add_all(prescriptions_entries)
+    session.add_all(doctors_entries)
     session.commit()
 
 # Simple Queries
@@ -99,3 +124,16 @@ k_query = (
 results = session.scalars(k_query).one()
 for prescription in results:
     print(f"Priscription ID: {prescription.presID}, Issued by {prescription.pharmacist.pTitle}")
+
+
+# Faris Join Query
+doctor_prescription_query = (
+    select(Prescription.presID, Prescription.dateIssued, Doctor.dFirstName, Doctor.dLastName)
+    .join(Doctor, Prescription.dID == Doctor.dID)
+    .limit(10)
+)
+
+results = session.execute(doctor_prescription_query).fetchall()
+
+for presID, dateIssued, firstName, lastName in results:
+    print(f"Prescription {presID} was issued on {dateIssued} by Dr. {firstName} {lastName}")
