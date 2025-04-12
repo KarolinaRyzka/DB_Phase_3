@@ -29,12 +29,14 @@ class Pharmacist(Base):
     pMiddleName: Mapped[str] = mapped_column(String(55))
     pLastName: Mapped[str] = mapped_column(String(55))
     pTitle: Mapped[str] = mapped_column(String(30))
+
     prescriptions: Mapped[List["Prescription"]] = relationship(
         back_populates="pharmacist", cascade="all, delete-orphan"
     )
     
-    def __repr__(self) -> str: #represents the object as a string 
-        return f"Pharmacist(id={self.id!r}, name={self.name!r}, fullname={self.fullname!r})"
+    def __repr__(self) -> str:
+        return f"Pharmacist(pharmacistID={self.pharmacistID!r}, name={self.pFirstName!r} {self.pMiddleName!r} {self.pLastName!r}, title={self.pTitle!r})"
+
 
 #Karolina
 class Prescription(Base):
@@ -49,7 +51,7 @@ class Prescription(Base):
     pharmacist: Mapped["Pharmacist"] = relationship(back_populates="prescriptions")
     
     def __repr__(self) -> str:
-        return f"Address(id={self.id!r}, email_address={self.email_address!r})"
+        return f"Prescription(presID={self.presID!r}, dateIssued={self.dateIssued!r}, pharmacistID={self.pharmacistID!r})"
 
 #Create Tables
 Base.metadata.create_all(engine)
@@ -91,48 +93,9 @@ session = Session(engine)
 
 k_query = (
     select(Prescription)
-    .join(Pharmacist, Prescription.pharmacistID == Pharmacist.pharmacistID)
-    .where(Prescription.pharmacistID == 2)
+    .join(Prescription.pharmacist)
+    .where(Prescription.pTitle == "Lead Pharmacist")
 )
-results =  session.scalars(k_query).one()
-print("Prescribed by Pharmacist 2: " + results.pharmacistID)
-
-
-
-
-
-#Join Query
-stmt = (
-    select(Address)
-    .join(Address.user)
-    .where(User.name == "sandy")
-    .where(Address.email_address == "sandy@sqlalchemy.org")
-)
-sandy_address = session.scalars(stmt).one()
-print("Sandy's Address: " + sandy_address.email_address)
-
-#Updates Sandy's email
-sandy_address.email_address = "sandy_cheeks@sqlalchemy.org"
-
-#Adds address for Patrick
-stmt = select(User).where(User.name == "patrick")
-patrick = session.scalars(stmt).one()
-patrick.addresses.append(Address(email_address="patrickstar@sqlalchemy.org"))
-session.commit()
-
-#Show updated addresses
-print("\n## Address Table Contents - After Update ##")
-addresses = session.query(Address)  
-for address in addresses:  
-    print("Email Address: " + address.email_address)
-
-#Deletes one of Sandy's email addresses (sandy_cheeks@...)
-sandy = session.get(User, 2) #2 is the primary key (id)
-sandy.addresses.remove(sandy_address)
-session.commit()
-
-#Shows updated addresses
-print("\n## Address Table Contents - After Delete##")
-addresses = session.query(Address)  
-for address in addresses:  
-    print("Email Address: " + address.email_address)
+results = session.scalars(k_query).one()
+for prescription in results:
+    print(f"Priscription ID: {prescription.presID}, Issued by {prescription.pharmacist.pTitle}")
