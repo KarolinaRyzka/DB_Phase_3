@@ -35,6 +35,25 @@ class Doctor(Base):
         back_populates="doctor", cascade="all, delete-orphan"
     )
 
+# Charles
+class Patient(Base):
+    __tablename__ = "Patient"
+    
+    patientID: Mapped[int] = mapped_column(Integer, primary_key=True)
+    birthdate: Mapped[str] = mapped_column(Date)
+    patPhoneNum: Mapped[str] = mapped_column(String(20))
+    patFirstName: Mapped[str] = mapped_column(String(55))
+    patMiddleName: Mapped[str] = mapped_column(String(55))
+    patLastName: Mapped[str] = mapped_column(String(55))
+    patLine1: Mapped[str] = mapped_column(String(100))
+    patLine2: Mapped[str] = mapped_column(String(100))
+    patZipCode: Mapped[str] = mapped_column(String(10))
+    patCityState: Mapped[str] = mapped_column(String(20))
+    
+    prescriptions: Mapped[List["Prescription"]] = relationship(
+        back_populates="patient", cascade="all, delete-orphan"    
+    )
+    
 #Karolina
 class Pharmacist(Base):
     __tablename__ = "Pharmacist"
@@ -146,6 +165,34 @@ wholesaler_entries = [
     Wholesaler(wholeID=4, wholesalerName="Medico Wholesale", wPhoneNum = "222-333-4444", wAddress="45 Medical Park, Building 5, 60605, Chicago, IL", line1="45 Medical Park", line2="Building 5", zipCode="60605", cityState="Chicago, IL")
 ]
 
+#Charles Patient Entries
+patient_entries = [
+    Patient(patientID=1, patFirstName='John', patMiddleName='Michael', patLastName='Smith', birthdate=datetime.strptime('1985-04-12', '%Y-%m-%d').date(), patPhoneNum='555-123-4567', patLine1='123 Elm St', patLine2='Apt 4B', patZipCode='62701', patCityState='Springfield, IL'),
+    Patient(patientID=2, patFirstName='Sarah', patMiddleName=None, patLastName='Johnson', birthdate=datetime.strptime('1990-08-23', '%Y-%m-%d').date(), patPhoneNum='555-234-5678', patLine1='456 Oak St', patLine2=None, patZipCode='63101', patCityState='St. Louis, MO'),
+    Patient(patientID=3, patFirstName='James', patMiddleName='Daniel', patLastName='Brown', birthdate=datetime.strptime('1977-01-15', '%Y-%m-%d').date(), patPhoneNum='555-345-6789', patLine1='789 Pine St', patLine2=None, patZipCode='60601', patCityState='Chicago, IL'),
+    Patient(patientID=4, patFirstName='Emily', patMiddleName=None, patLastName='Davis', birthdate=datetime.strptime('1995-11-30', '%Y-%m-%d').date(), patPhoneNum='555-456-7890', patLine1='321 Maple St', patLine2='Apt 2A', patZipCode='61602', patCityState='Peoria, IL'),
+    Patient(patientID=5, patFirstName='William', patMiddleName='Andrew', patLastName='Miller', birthdate=datetime.strptime('1988-02-10', '%Y-%m-%d').date(), patPhoneNum='555-567-8901', patLine1='987 Cedar St', patLine2='Apt 3C', patZipCode='62701', patCityState='Springfield, IL'),
+    Patient(patientID=6, patFirstName='Olivia', patMiddleName=None, patLastName='Martinez', birthdate=datetime.strptime('1988-02-10', '%Y-%m-%d').date(), patPhoneNum='555-678-9012', patLine1='654 Birch St', patLine2='Apt 5D', patZipCode='64101', patCityState='Kansas City, MO'),
+    Patient(patientID=7, patFirstName='Benjamin', patMiddleName='Alexander', patLastName='Wilson', birthdate=datetime.strptime('1993-06-14', '%Y-%m-%d').date(), patPhoneNum='555-789-0123', patLine1='432 Willow St', patLine2=None, patZipCode='60601', patCityState='Chicago, IL'),
+    Patient(patientID=8, patFirstName='Sophia', patMiddleName='Grace', patLastName='Moore', birthdate=datetime.strptime('1981-12-22', '%Y-%m-%d').date(), patPhoneNum='555-890-1234', patLine1='876 Spruce St', patLine2='Apt 7A', patZipCode='63101', patCityState='St. Louis, MO'),
+    Patient(patientID=9, patFirstName='Ethan', patMiddleName=None, patLastName='Taylor', birthdate=datetime.strptime('1999-07-04', '%Y-%m-%d').date(), patPhoneNum='555-901-2345', patLine1='543 Ash St', patLine2=None, patZipCode='62701', patCityState='Springfield, IL'),
+    Patient(patientID=10, patFirstName='Mia', patMiddleName='Elizabeth', patLastName='Anderson', birthdate=datetime.strptime('2002-09-18', '%Y-%m-%d').date(), patPhoneNum='555-012-3456', patLine1='109 Hickory St', patLine2='Apt 1B', patZipCode='60601', patCityState='Chicago, IL'),
+    Patient(patientID=11, patFirstName='Noah', patMiddleName=None, patLastName='Thomas', birthdate=datetime.strptime('1996-05-29', '%Y-%m-%d').date(), patPhoneNum='555-123-5678', patLine1='222 Poplar St', patLine2=None, patZipCode='61602', patCityState='Peoria, IL'),
+    Patient(patientID=12, patFirstName='Ava', patMiddleName='Lily', patLastName='White', birthdate=datetime.strptime('1992-11-02', '%Y-%m-%d').date(), patPhoneNum='555-234-6789', patLine1='678 Oakwood St', patLine2=None, patZipCode='64101', patCityState='Kansas City, MO'),
+    Patient(patientID=13, patFirstName='Mason', patMiddleName='Henry', patLastName='Harris', birthdate=datetime.strptime('1983-04-11', '%Y-%m-%d').date(), patPhoneNum='555-345-7890', patLine1='345 Elmwood St', patLine2=None, patZipCode='60601', patCityState='Chicago, IL'),
+    Patient(patientID=14, patFirstName='Isabella', patMiddleName=None, patLastName='Clark', birthdate=datetime.strptime('1997-08-20', '%Y-%m-%d').date(), patPhoneNum='555-456-8901', patLine1='210 Cedarwood St', patLine2=None, patZipCode='62701', patCityState='Springfield, IL'),
+    Patient(patientID=15, patFirstName='Logan', patMiddleName='David', patLastName='Lewis', birthdate=datetime.strptime('1991-03-03', '%Y-%m-%d').date(), patPhoneNum='555-567-9012', patLine1='333 Redwood St', patLine2='Apt 6C', patZipCode='61602', patCityState='Peoria, IL'),
+    Patient(patientID=16, patFirstName='Ella', patMiddleName=None, patLastName='Robinson', birthdate=datetime.strptime('1986-06-12', '%Y-%m-%d').date(), patPhoneNum='555-678-0123', patLine1='888 Walnut St', patLine2=None, patZipCode='63101', patCityState='St. Louis, MO'),
+    Patient(patientID=17, patFirstName='Lucas', patMiddleName='Samuel', patLastName='Hall', birthdate=datetime.strptime('1980-10-01', '%Y-%m-%d').date(), patPhoneNum='555-789-1234', patLine1='555 Maplewood St', patLine2=None, patZipCode='62701', patCityState='Springfield, IL'),
+    Patient(patientID=18, patFirstName='Amelia', patMiddleName='Victoria', patLastName='Allen', birthdate=datetime.strptime('1998-01-17', '%Y-%m-%d').date(), patPhoneNum='555-890-2345', patLine1='777 Elmwood St', patLine2='Apt 8B', patZipCode='64101', patCityState='Kansas City, MO'),
+    Patient(patientID=19, patFirstName='Elijah', patMiddleName=None, patLastName='King', birthdate=datetime.strptime('1989-09-26', '%Y-%m-%d').date(), patPhoneNum='555-901-3456', patLine1='111 Ashwood St', patLine2=None, patZipCode='60601', patCityState='Chicago, IL'),
+    Patient(patientID=20, patFirstName='Charlotte', patMiddleName='Abigail', patLastName='Wright', birthdate=datetime.strptime('2001-12-05', '%Y-%m-%d').date(), patPhoneNum='555-012-4567', patLine1='999 Birchwood St', patLine2='Apt 4D', patZipCode='63101', patCityState='St. Louis, MO'),
+    Patient(patientID=21, patFirstName='Alexander', patMiddleName=None, patLastName='Scott', birthdate=datetime.strptime('1984-07-15', '%Y-%m-%d').date(), patPhoneNum='555-123-6789', patLine1='444 Willowwood St', patLine2=None, patZipCode='61602', patCityState='Peoria, IL'),
+    Patient(patientID=22, patFirstName='Harper', patMiddleName=None, patLastName='Young', birthdate=datetime.strptime('1994-05-03', '%Y-%m-%d').date(), patPhoneNum='555-234-7890', patLine1='321 Oakview St', patLine2='Apt 3A', patZipCode='60601', patCityState='Chicago, IL'),
+    Patient(patientID=23, patFirstName='Daniel', patMiddleName='Matthew', patLastName='Baker', birthdate=datetime.strptime('1979-02-28', '%Y-%m-%d').date(), patPhoneNum='555-345-8901', patLine1='678 Elmview St', patLine2=None, patZipCode='62701', patCityState='Springfield, IL'),
+    Patient(patientID=24, patFirstName='Zoey', patMiddleName='Hannah', patLastName='Green', birthdate=datetime.strptime('2003-06-07', '%Y-%m-%d').date(), patPhoneNum='555-456-9012', patLine1='222 Pineview St', patLine2='Apt 2D', patZipCode='64101', patCityState='Kansas City, MO'),
+    Patient(patientID=25, patFirstName='Jackson', patMiddleName='Lucas', patLastName='Adams', birthdate=datetime.strptime('1987-11-09', '%Y-%m-%d').date(), patPhoneNum='555-567-0123', patLine1='555 Birchview St', patLine2=None, patZipCode='63101', patCityState='St. Louis, MO'),
+]
 
 doctors_entries = [
     Doctor(dID=1, dPhoneNum='312-000-1111', dName='Dr. John Smith', dFirstName='John', dMiddleName='Mark', dLastName='Smith'),
@@ -200,6 +247,18 @@ med_whole_query = (
 results = session.scalars(med_whole_query).all()
 for r in results:
     print(f"Medicine {r.medName} supplied by wholesaler ID {r.wholeID}, name {r.wholesaler.wholesalerName}")
+
+# Charles Join Query
+patient_stmt = (
+    select(Prescription.pID, Patient.patZipCode)
+    .join(Patient, Prescription.patientID == Patient.patientID) 
+    .where(Patient.patCityState == "Chicago, IL")
+    .limit(5)
+)
+
+results = session.execute(patient_stmt).all()
+for patient in results:
+    print(f"Patient {prescription.pID} will be delivered to Zip Code: {prescription.patZipCode}")
 
 
 
