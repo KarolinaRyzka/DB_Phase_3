@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from sqlalchemy import Date
 from datetime import datetime
+import psycopg2
 
 #DB Connection: create_engine(DBMS_name+driver://<username>:<password>@<hostname>/<database_name>)
 engine = create_engine("postgresql+psycopg2://postgres:1@localhost/postgres")
@@ -18,6 +19,21 @@ engine = create_engine("postgresql+psycopg2://postgres:1@localhost/postgres")
 #Define Classes/Tables
 class Base(DeclarativeBase):
     pass
+
+# Faris
+class Doctor(Base):
+    __tablename__ = "Doctor"
+    
+    dID: Mapped[int] = mapped_column(Integer, primary_key=True)
+    dPhoneNum: Mapped[str] = mapped_column(String(20))
+    dName: Mapped[str] = mapped_column(String(100))
+    dFirstName: Mapped[str] = mapped_column(String(55))
+    dMiddleName: Mapped[str] = mapped_column(String(55))
+    dLastName: Mapped[str] = mapped_column(String(55))
+    
+    prescriptions: Mapped[List["Prescription"]] = relationship(
+        back_populates="doctor", cascade="all, delete-orphan"
+    )
 
 #Karolina
 class Pharmacist(Base):
@@ -48,6 +64,7 @@ class Prescription(Base):
     pharmacistID: Mapped[int] = mapped_column(Integer, ForeignKey("Pharmacist.pharmacistID"))
     
     pharmacist: Mapped["Pharmacist"] = relationship(back_populates="prescriptions")
+    doctor: Mapped["Doctor"] = relationship(back_populates="prescriptions")
     
     def __repr__(self) -> str:
         return f"Prescription(presID={self.presID!r}, dateIssued={self.dateIssued!r}, pharmacistID={self.pharmacistID!r})"
@@ -111,6 +128,7 @@ prescriptions_entries = [
     Prescription(presID=1014, dateIssued=datetime.strptime('2025-03-11', '%Y-%m-%d').date(), patientID=5, dID=5, pharmacistID=3),
 ]
 
+
 #Lee
 medicine_entries = [
     Medicine(mID=1, medName="Ibuprofen", price=25.99, wholeID=1),
@@ -127,10 +145,22 @@ wholesaler_entries = [
     Wholesaler(wholeID=3, wholesalerName="Global Meds Supply", wPhoneNum="777-888-9999", wAddress="30 Pharma Street, Warehouse 5, 90002, Los Angeles, CA", line1="30 Pharma Street", line2="Warehouse 5", zipCode="90002", cityState="Los Angeles, CA"),
     Wholesaler(wholeID=4, wholesalerName="Medico Wholesale", wPhoneNum = "222-333-4444", wAddress="45 Medical Park, Building 5, 60605, Chicago, IL", line1="45 Medical Park", line2="Building 5", zipCode="60605", cityState="Chicago, IL")
 ]
+=======
+# Faris
+doctors_entries = [
+    Doctor(dID=1, dPhoneNum='312-000-1111', dName='Dr. John Smith', dFirstName='John', dMiddleName='Mark', dLastName='Smith'),
+    Doctor(dID=2, dPhoneNum='312-000-2222', dName='Dr. Sarah Lee', dFirstName='Sarah', dMiddleName='Alen', dLastName='Lee'),
+    Doctor(dID=3, dPhoneNum='312-000-3333', dName='Dr. Amir Khan', dFirstName='Amir', dMiddleName='Zain', dLastName='Khan'),
+    Doctor(dID=4, dPhoneNum='312-000-4444', dName='Dr. Emily Chen', dFirstName='Emily', dMiddleName='Rey', dLastName='Chen'),
+    Doctor(dID=5, dPhoneNum='312-000-5555', dName='Dr. David Park', dFirstName='David', dMiddleName='Tom', dLastName='Park'),
+]
+
+
 
 #Insert Data
 with Session(engine) as session:
-    session.add_all(pharmacists_entries)
+    session.add_all(doctors_entries)
+    session.add_all(pharmacists_entries)      
     session.add_all(prescriptions_entries)
     session.add_all(wholesaler_entries)
     session.add_all(medicine_entries)
@@ -141,14 +171,27 @@ with Session(engine) as session:
 # Simple Queries
 session = Session(engine)  
 
-k_query = (
-    select(Prescription)
-    .join(Prescription.pharmacist)
-    .where(Prescription.pTitle == "Lead Pharmacist")
+prescribedByLeadPharmacist = (
+    select(Prescription.presID, Pharmacist.pFirstName, Pharmacist.pLastName )
+    .join(Pharmacist, Prescription.pharmacistID == Pharmacist.pharmacistID)
+    .where(Pharmacist.pTitle == "Lead Pharmacist")
 )
-results = session.scalars(k_query).one()
-for prescription in results:
-    print(f"Prescription ID: {prescription.presID}, Issued by {prescription.pharmacist.pTitle}")
+results = session.execute(prescribedByLeadPharmacist).all()
+for presID, firstName, lastName in results:
+    print(f"Priscription ID: {presID}, Issued by the Lead Pharmacist, {firstName} {lastName}")
+
+
+# Faris Join Query
+doctor_prescription_query = (
+    select(Prescription.presID, Prescription.dateIssued, Doctor.dFirstName, Doctor.dLastName)
+    .join(Doctor, Prescription.dID == Doctor.dID)
+)
+results = session.execute(doctor_prescription_query).fetchall()
+
+for presID, dateIssued, firstName, lastName in results:
+    print(f"Prescription {presID} was issued on {dateIssued} by Dr. {firstName} {lastName}")
+
+
 
 med_whole_query = (
     select(Medicine)
@@ -157,3 +200,6 @@ med_whole_query = (
 results = session.scalars(med_whole_query).all()
 for r in results:
     print(f"Medicine {r.medName} supplied by wholesaler ID {r.wholeID}, name {r.wholesaler.wholesalerName}")
+
+
+
