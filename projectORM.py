@@ -156,6 +156,6 @@ med_whole_query = (
     select(Medicine)
     .join(Medicine.wholesaler)
 )
-results = session.scalars(l_query).all()
+results = session.scalars(med_whole_query).all()
 for r in results:
     print(f"Medicine {r.medName} supplied by wholesaler ID {r.wholeID}, name {r.wholesaler.wholesalerName}")
