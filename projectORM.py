@@ -117,13 +117,13 @@ with Session(engine) as session:
 session = Session(engine)  
 
 k_query = (
-    select(Prescription)
-    .join(Prescription.pharmacist)
+    select(Prescription.presID, Pharmacist.pFirstName, Pharmacist.pLastName )
+    .join(Pharmacist, Prescription.pharmacistID == Pharmacist.pharmacistID)
     .where(Prescription.pTitle == "Lead Pharmacist")
 )
-results = session.scalars(k_query).one()
-for prescription in results:
-    print(f"Priscription ID: {prescription.presID}, Issued by {prescription.pharmacist.pTitle}")
+results = session.execute(k_query).all()
+for presID, firstName, lastName in results:
+    print(f"Priscription ID: {presID}, Issued by the Lead Pharmacist, {firstName} {lastName}")
 
 
 # Faris Join Query
