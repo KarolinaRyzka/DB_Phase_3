@@ -53,7 +53,7 @@ class Pharmacist(Base):
         return f"Pharmacist(pharmacistID={self.pharmacistID!r}, name={self.pFirstName!r} {self.pMiddleName!r} {self.pLastName!r}, title={self.pTitle!r})"
 
 
-# #Karolina
+#Karolina
 class Prescription(Base):
     __tablename__ = "Prescription"
     
@@ -160,10 +160,11 @@ doctors_entries = [
 #Insert Data
 with Session(engine) as session:
     session.add_all(doctors_entries)
-    session.add_all(pharmacists_entries)      
-    session.add_all(prescriptions_entries)
+    session.add_all(pharmacists_entries)  
     session.add_all(wholesaler_entries)
-    session.add_all(medicine_entries)
+    session.add_all(medicine_entries)    
+    session.add_all(prescriptions_entries)
+   
     session.commit()
 
 
