@@ -152,7 +152,7 @@ session = Session(engine)
 # for prescription in results:
 #     print(f"Prescription ID: {prescription.presID}, Issued by {prescription.pharmacist.pTitle}")
 
-l_query = (
+med_whole_query = (
     select(Medicine)
     .join(Medicine.wholesaler)
 )
