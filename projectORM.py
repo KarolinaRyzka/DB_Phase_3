@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from sqlalchemy import Date
 from datetime import datetime
+import psycopg2
 
 #DB Connection: create_engine(DBMS_name+driver://<username>:<password>@<hostname>/<database_name>)
 engine = create_engine("postgresql+psycopg2://postgres:1006@localhost/postgres")
@@ -59,7 +60,7 @@ class Prescription(Base):
     
     presID: Mapped[int] = mapped_column(Integer, primary_key=True)
     dateIssued: Mapped[str] = mapped_column(Date)
-    patientID: Mapped[int] = mapped_column(Integer, ForeignKey("Patient.patientID"))
+    #patientID: Mapped[int] = mapped_column(Integer, ForeignKey("Patient.patientID"))
     dID: Mapped[int] = mapped_column(Integer, ForeignKey("Doctor.dID"))
     pharmacistID: Mapped[int] = mapped_column(Integer, ForeignKey("Pharmacist.pharmacistID"))
     
@@ -119,7 +120,7 @@ session = Session(engine)
 k_query = (
     select(Prescription.presID, Pharmacist.pFirstName, Pharmacist.pLastName )
     .join(Pharmacist, Prescription.pharmacistID == Pharmacist.pharmacistID)
-    .where(Prescription.pTitle == "Lead Pharmacist")
+    .where(Pharmacist.pTitle == "Lead Pharmacist")
 )
 results = session.execute(k_query).all()
 for presID, firstName, lastName in results:
