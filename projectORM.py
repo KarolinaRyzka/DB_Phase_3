@@ -118,12 +118,12 @@ with Session(engine) as session:
 # Simple Queries
 session = Session(engine)  
 
-k_query = (
+prescribedByLeadPharmacist = (
     select(Prescription.presID, Pharmacist.pFirstName, Pharmacist.pLastName )
     .join(Pharmacist, Prescription.pharmacistID == Pharmacist.pharmacistID)
     .where(Pharmacist.pTitle == "Lead Pharmacist")
 )
-results = session.execute(k_query).all()
+results = session.execute(prescribedByLeadPharmacist).all()
 for presID, firstName, lastName in results:
     print(f"Priscription ID: {presID}, Issued by the Lead Pharmacist, {firstName} {lastName}")
 
