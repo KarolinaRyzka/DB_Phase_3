@@ -14,7 +14,7 @@ from datetime import datetime
 import psycopg2
 
 #DB Connection: create_engine(DBMS_name+driver://<username>:<password>@<hostname>/<database_name>)
-engine = create_engine("postgresql+psycopg2://postgres:1@localhost/postgres")
+engine = create_engine("postgresql+psycopg2://postgres:1006@localhost/postgres")
 
 #Define Classes/Tables
 class Base(DeclarativeBase):
@@ -84,6 +84,7 @@ class Prescription(Base):
     
     pharmacist: Mapped["Pharmacist"] = relationship(back_populates="prescriptions")
     doctor: Mapped["Doctor"] = relationship(back_populates="prescriptions")
+    patient: Mapped["Patient"] = relationship(back_populates="presxriptions")
     
     def __repr__(self) -> str:
         return f"Prescription(presID={self.presID!r}, dateIssued={self.dateIssued!r}, pharmacistID={self.pharmacistID!r})"
@@ -208,12 +209,12 @@ doctors_entries = [
 with Session(engine) as session:
     session.add_all(doctors_entries)
     session.add_all(pharmacists_entries)  
+    session.add_all(patient_entries)
     session.add_all(wholesaler_entries)
     session.add_all(medicine_entries)    
     session.add_all(prescriptions_entries)
-   
-    session.commit()
 
+    session.commit()
 
 
 
@@ -228,17 +229,14 @@ results = session.execute(prescribedByLeadPharmacist).all()
 for presID, firstName, lastName in results:
     print(f"Priscription ID: {presID}, Issued by the Lead Pharmacist, {firstName} {lastName}")
 
-
 # Faris Join Query
 doctor_prescription_query = (
     select(Prescription.presID, Prescription.dateIssued, Doctor.dFirstName, Doctor.dLastName)
     .join(Doctor, Prescription.dID == Doctor.dID)
 )
 results = session.execute(doctor_prescription_query).fetchall()
-
 for presID, dateIssued, firstName, lastName in results:
     print(f"Prescription {presID} was issued on {dateIssued} by Dr. {firstName} {lastName}")
-
 
 #Lee Query
 med_whole_query = (
@@ -256,10 +254,9 @@ patient_stmt = (
     .where(Patient.patCityState == "Chicago, IL")
     .limit(5)
 )
-
 results = session.execute(patient_stmt).all()
-for patient in results:
-    print(f"Patient {prescription.pID} will be delivered to Zip Code: {prescription.patZipCode}")
+for pID, patZipCode in results:
+    print(f"Patient {pID} will be delivered to Zip Code: {patZipCode}")
 
 
 
