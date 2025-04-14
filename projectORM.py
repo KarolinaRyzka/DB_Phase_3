@@ -43,10 +43,10 @@ class Patient(Base):
     birthdate: Mapped[str] = mapped_column(Date)
     patPhoneNum: Mapped[str] = mapped_column(String(20))
     patFirstName: Mapped[str] = mapped_column(String(55))
-    patMiddleName: Mapped[str] = mapped_column(String(55))
+    patMiddleName: Mapped[Optional[str]] = mapped_column(String(55), nullable=True)
     patLastName: Mapped[str] = mapped_column(String(55))
     patLine1: Mapped[str] = mapped_column(String(100))
-    patLine2: Mapped[str] = mapped_column(String(100))
+    patLine2: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     patZipCode: Mapped[str] = mapped_column(String(10))
     patCityState: Mapped[str] = mapped_column(String(20))
     
@@ -84,7 +84,7 @@ class Prescription(Base):
     
     pharmacist: Mapped["Pharmacist"] = relationship(back_populates="prescriptions")
     doctor: Mapped["Doctor"] = relationship(back_populates="prescriptions")
-    patient: Mapped["Patient"] = relationship(back_populates="presxriptions")
+    patient: Mapped["Patient"] = relationship(back_populates="prescriptions")
     
     def __repr__(self) -> str:
         return f"Prescription(presID={self.presID!r}, dateIssued={self.dateIssued!r}, pharmacistID={self.pharmacistID!r})"
@@ -120,6 +120,8 @@ class Wholesaler(Base):
     def __repr__(self) -> str:
         return f"Wholesaler(wholeID={self.wholeID!r}, name={self.wholesalerName!r}, phoneNum={self.wPhoneNum!r}, address={self.wAddress!r})"
 
+Base.metadata.drop_all(engine)
+ 
 #Create Tables
 Base.metadata.create_all(engine)
 
@@ -249,14 +251,14 @@ for r in results:
 
 # Charles Join Query
 patient_stmt = (
-    select(Prescription.pID, Patient.patZipCode)
+    select(Prescription.presID, Patient.patZipCode)
     .join(Patient, Prescription.patientID == Patient.patientID) 
     .where(Patient.patCityState == "Chicago, IL")
     .limit(5)
 )
 results = session.execute(patient_stmt).all()
-for pID, patZipCode in results:
-    print(f"Patient {pID} will be delivered to Zip Code: {patZipCode}")
+for presID, patZipCode in results:
+    print(f"Prescription {presID} will be delivered to Zip Code: {patZipCode}")
 
 
 
