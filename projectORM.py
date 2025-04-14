@@ -65,6 +65,7 @@ class Prescription(Base):
     pharmacistID: Mapped[int] = mapped_column(Integer, ForeignKey("Pharmacist.pharmacistID"))
     
     pharmacist: Mapped["Pharmacist"] = relationship(back_populates="prescriptions")
+    doctor: Mapped["Doctor"] = relationship(back_populates="prescriptions")
     
     def __repr__(self) -> str:
         return f"Prescription(presID={self.presID!r}, dateIssued={self.dateIssued!r}, pharmacistID={self.pharmacistID!r})"
@@ -109,9 +110,9 @@ doctors_entries = [
 
 #Insert Data
 with Session(engine) as session:
-    session.add_all(pharmacists_entries)
-    session.add_all(prescriptions_entries)
     session.add_all(doctors_entries)
+    session.add_all(pharmacists_entries)      
+    session.add_all(prescriptions_entries)
     session.commit()
 
 # Simple Queries
@@ -131,7 +132,6 @@ for presID, firstName, lastName in results:
 doctor_prescription_query = (
     select(Prescription.presID, Prescription.dateIssued, Doctor.dFirstName, Doctor.dLastName)
     .join(Doctor, Prescription.dID == Doctor.dID)
-    .limit(10)
 )
 
 results = session.execute(doctor_prescription_query).fetchall()
