@@ -60,7 +60,7 @@ class Prescription(Base):
     
     presID: Mapped[int] = mapped_column(Integer, primary_key=True)
     dateIssued: Mapped[str] = mapped_column(Date)
-    #patientID: Mapped[int] = mapped_column(Integer, ForeignKey("Patient.patientID"))
+    patientID: Mapped[int] = mapped_column(Integer, ForeignKey("Patient.patientID"))
     dID: Mapped[int] = mapped_column(Integer, ForeignKey("Doctor.dID"))
     pharmacistID: Mapped[int] = mapped_column(Integer, ForeignKey("Pharmacist.pharmacistID"))
     
