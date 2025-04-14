@@ -61,9 +61,8 @@ class Medicine(Base):
     price: Mapped[float] = mapped_column(Float)
     medName: Mapped[str] = mapped_column(String)
     wholeID: Mapped[int] = mapped_column(Integer, ForeignKey("Wholesaler.wholeID"))
-
-    medicine: Mapped["Medicine"] = relationship(
-        back_populates="wholesaler", cascade="all, delete-orphan")
+    
+    wholesaler: Mapped["Wholesaler"] = relationship(back_populates="medicines")
 
     def __repr__(self) -> str:
         return f"Medicine(mID={self.mID!r}, name={self.medName!r}, price={self.price!r}, wholeID={self.wholeID!r})"
@@ -80,7 +79,7 @@ class Wholesaler(Base):
     zipCode : Mapped[int] = mapped_column(Integer)
     cityState : Mapped[str] = mapped_column(String(100))
 
-    wholesaler: Mapped["Wholesaler"] = relationship(back_populates="medicine")
+    medicines: Mapped[List["Medicine"]] = relationship(back_populates="wholesaler")
 
     def __repr__(self) -> str:
         return f"Wholesaler(wholeID={self.wholeID!r}, name={self.wholesalerName!r}, phoneNum={self.wPhoneNum!r}, address={self.wAddress!r})"
@@ -148,4 +147,13 @@ k_query = (
 )
 results = session.scalars(k_query).one()
 for prescription in results:
-    print(f"Priscription ID: {prescription.presID}, Issued by {prescription.pharmacist.pTitle}")
+    print(f"Prescription ID: {prescription.presID}, Issued by {prescription.pharmacist.pTitle}")
+
+l_query = (
+    select(Medicine)
+    .join(Medicine.wholesaler)
+    .where(Wholesaler.wholeID == 2)
+)
+results = session.scalars(l_query).all()
+for r in results:
+    print(f"Medicine {r.medName} supplied by wholesaler ID {r.wholeID}")
