@@ -145,8 +145,8 @@ wholesaler_entries = [
     Wholesaler(wholeID=3, wholesalerName="Global Meds Supply", wPhoneNum="777-888-9999", wAddress="30 Pharma Street, Warehouse 5, 90002, Los Angeles, CA", line1="30 Pharma Street", line2="Warehouse 5", zipCode="90002", cityState="Los Angeles, CA"),
     Wholesaler(wholeID=4, wholesalerName="Medico Wholesale", wPhoneNum = "222-333-4444", wAddress="45 Medical Park, Building 5, 60605, Chicago, IL", line1="45 Medical Park", line2="Building 5", zipCode="60605", cityState="Chicago, IL")
 ]
-=======
-# Faris
+
+
 doctors_entries = [
     Doctor(dID=1, dPhoneNum='312-000-1111', dName='Dr. John Smith', dFirstName='John', dMiddleName='Mark', dLastName='Smith'),
     Doctor(dID=2, dPhoneNum='312-000-2222', dName='Dr. Sarah Lee', dFirstName='Sarah', dMiddleName='Alen', dLastName='Lee'),
@@ -168,9 +168,9 @@ with Session(engine) as session:
 
 
 
-# Simple Queries
-session = Session(engine)  
 
+session = Session(engine)  
+# Karolina Query 
 prescribedByLeadPharmacist = (
     select(Prescription.presID, Pharmacist.pFirstName, Pharmacist.pLastName )
     .join(Pharmacist, Prescription.pharmacistID == Pharmacist.pharmacistID)
@@ -192,7 +192,7 @@ for presID, dateIssued, firstName, lastName in results:
     print(f"Prescription {presID} was issued on {dateIssued} by Dr. {firstName} {lastName}")
 
 
-
+#Lee Query
 med_whole_query = (
     select(Medicine)
     .join(Medicine.wholesaler)
