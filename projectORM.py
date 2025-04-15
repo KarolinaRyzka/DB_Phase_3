@@ -1,20 +1,11 @@
-from typing import List
-from typing import Optional
-from sqlalchemy import ForeignKey
-from sqlalchemy import String, Integer, Float
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-from sqlalchemy import select
-from sqlalchemy import Date
+from typing import List, Optional
+from sqlalchemy import String, Integer, Float, ForeignKey, create_engine, select, Date
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 from datetime import datetime
-import psycopg2
 
-#DB Connection: create_engine(DBMS_name+driver://<username>:<password>@<hostname>/<database_name>)
-engine = create_engine("postgresql+psycopg2://postgres:1006@localhost/postgres")
+
+#replace {user} and {pass} before running
+engine = create_engine("postgresql+psycopg2://{user}:{pass}@localhost/postgres")
 
 #Define Classes/Tables
 class Base(DeclarativeBase):
@@ -72,7 +63,7 @@ class Pharmacist(Base):
         return f"Pharmacist(pharmacistID={self.pharmacistID!r}, name={self.pFirstName!r} {self.pMiddleName!r} {self.pLastName!r}, title={self.pTitle!r})"
 
 
-#Karolina
+#Karolina, Faris, Charles
 class Prescription(Base):
     __tablename__ = "Prescription"
     
@@ -102,6 +93,7 @@ class Medicine(Base):
 
     def __repr__(self) -> str:
         return f"Medicine(mID={self.mID!r}, name={self.medName!r}, price={self.price!r}, wholeID={self.wholeID!r})"
+
 #Lee    
 class Wholesaler(Base):
     __tablename__ = "Wholesaler"
@@ -120,19 +112,19 @@ class Wholesaler(Base):
     def __repr__(self) -> str:
         return f"Wholesaler(wholeID={self.wholeID!r}, name={self.wholesalerName!r}, phoneNum={self.wPhoneNum!r}, address={self.wAddress!r})"
 
-Base.metadata.drop_all(engine)
+Base.metadata.drop_all(engine) #for repeated testing
  
 #Create Tables
 Base.metadata.create_all(engine)
 
-# #pharmacist entries Karolina
+# pharmacist entries Karolina
 pharmacists_entries = [
     Pharmacist(pharmacistID=1, pFirstName='Robert', pMiddleName='Alan', pLastName='Wilson', pTitle='Pharmacist'),
     Pharmacist(pharmacistID=2, pFirstName='Jessica', pMiddleName='Marie', pLastName='Lopez', pTitle='Pharmacist'),
     Pharmacist(pharmacistID=3, pFirstName='Daniel', pMiddleName='Edward', pLastName='Kim', pTitle='Lead Pharmacist'),
 ]
 
-# #prescription entries Karolina
+# prescription entries Karolina, Faris, Charles
 prescriptions_entries = [
     Prescription(presID=1001, dateIssued=datetime.strptime('2025-03-01', '%Y-%m-%d').date(), patientID=1, dID=1, pharmacistID=1),
     Prescription(presID=1002, dateIssued=datetime.strptime('2025-03-02', '%Y-%m-%d').date(), patientID=2, dID=2, pharmacistID=2),
@@ -150,8 +142,7 @@ prescriptions_entries = [
     Prescription(presID=1014, dateIssued=datetime.strptime('2025-03-11', '%Y-%m-%d').date(), patientID=5, dID=5, pharmacistID=3),
 ]
 
-
-#Lee
+# medicine entries Lee
 medicine_entries = [
     Medicine(mID=1, medName="Ibuprofen", price=25.99, wholeID=1),
     Medicine(mID=2, medName="Amoxicillin", price=12.50, wholeID=2),
@@ -160,7 +151,7 @@ medicine_entries = [
     Medicine(mID=5, medName="Insulin", price=99.99, wholeID=1),
 ]
 
-#Lee
+# wholesaler entries Lee
 wholesaler_entries = [
     Wholesaler(wholeID=1, wholesalerName="MediSupplies, Inc.", wPhoneNum="111-222-3333", wAddress="10 Health Blvd, Suite 100, 60602, Chicago, IL", line1="10 Health Blvd", line2="Suite 100", zipCode="60602", cityState="Chicago, IL"),
     Wholesaler(wholeID=2, wholesalerName="Pharma Distributers LLC", wPhoneNum="444-555-6666", wAddress="20 Medicine Way, Building A, 10002, New York, NY", line1="20 Medicine Way", line2="Building A", zipCode="10002", cityState="New York, NY"),
@@ -168,7 +159,7 @@ wholesaler_entries = [
     Wholesaler(wholeID=4, wholesalerName="Medico Wholesale", wPhoneNum = "222-333-4444", wAddress="45 Medical Park, Building 5, 60605, Chicago, IL", line1="45 Medical Park", line2="Building 5", zipCode="60605", cityState="Chicago, IL")
 ]
 
-#Charles Patient Entries
+# patient entries Charles
 patient_entries = [
     Patient(patientID=1, patFirstName='John', patMiddleName='Michael', patLastName='Smith', birthdate=datetime.strptime('1985-04-12', '%Y-%m-%d').date(), patPhoneNum='555-123-4567', patLine1='123 Elm St', patLine2='Apt 4B', patZipCode='62701', patCityState='Springfield, IL'),
     Patient(patientID=2, patFirstName='Sarah', patMiddleName=None, patLastName='Johnson', birthdate=datetime.strptime('1990-08-23', '%Y-%m-%d').date(), patPhoneNum='555-234-5678', patLine1='456 Oak St', patLine2=None, patZipCode='63101', patCityState='St. Louis, MO'),
@@ -197,6 +188,7 @@ patient_entries = [
     Patient(patientID=25, patFirstName='Jackson', patMiddleName='Lucas', patLastName='Adams', birthdate=datetime.strptime('1987-11-09', '%Y-%m-%d').date(), patPhoneNum='555-567-0123', patLine1='555 Birchview St', patLine2=None, patZipCode='63101', patCityState='St. Louis, MO'),
 ]
 
+#doctors entries Faris
 doctors_entries = [
     Doctor(dID=1, dPhoneNum='312-000-1111', dName='Dr. John Smith', dFirstName='John', dMiddleName='Mark', dLastName='Smith'),
     Doctor(dID=2, dPhoneNum='312-000-2222', dName='Dr. Sarah Lee', dFirstName='Sarah', dMiddleName='Alen', dLastName='Lee'),
@@ -206,8 +198,7 @@ doctors_entries = [
 ]
 
 
-
-#Insert Data
+#Insert Objects
 with Session(engine) as session:
     session.add_all(doctors_entries)
     session.add_all(pharmacists_entries)  
@@ -215,30 +206,28 @@ with Session(engine) as session:
     session.add_all(wholesaler_entries)
     session.add_all(medicine_entries)    
     session.add_all(prescriptions_entries)
-
     session.commit()
-
 
 
 session = Session(engine)  
 # Karolina Query 
 prescribedByLeadPharmacist = (
-    select(Prescription.presID, Pharmacist.pFirstName, Pharmacist.pLastName )
-    .join(Pharmacist, Prescription.pharmacistID == Pharmacist.pharmacistID)
+    select(Prescription)
+    .join(Prescription.pharmacist)
     .where(Pharmacist.pTitle == "Lead Pharmacist")
 )
-results = session.execute(prescribedByLeadPharmacist).all()
-for presID, firstName, lastName in results:
-    print(f"Priscription ID: {presID}, Issued by the Lead Pharmacist, {firstName} {lastName}")
+results = session.scalars(prescribedByLeadPharmacist).all()
+for p in results:
+    print(f"Prescription ID: {p.presID}, Issued by the Lead Pharmacist, {p.pharmacist.pFirstName} {p.pharmacist.pLastName}")
 
 # Faris Join Query
 doctor_prescription_query = (
-    select(Prescription.presID, Prescription.dateIssued, Doctor.dFirstName, Doctor.dLastName)
-    .join(Doctor, Prescription.dID == Doctor.dID)
+    select(Prescription)
+    .join(Prescription.doctor)
 )
-results = session.execute(doctor_prescription_query).fetchall()
-for presID, dateIssued, firstName, lastName in results:
-    print(f"Prescription {presID} was issued on {dateIssued} by Dr. {firstName} {lastName}")
+results = session.scalars(doctor_prescription_query).all()
+for p in results:
+    print(f"Prescription {p.presID} was issued on {p.dateIssued} by Dr. {p.doctor.dFirstName} {p.doctor.dLastName}")
 
 #Lee Query
 med_whole_query = (
@@ -246,19 +235,20 @@ med_whole_query = (
     .join(Medicine.wholesaler)
 )
 results = session.scalars(med_whole_query).all()
-for r in results:
-    print(f"Medicine {r.medName} supplied by wholesaler ID {r.wholeID}, name {r.wholesaler.wholesalerName}")
+for m in results:
+    print(f"Medicine {m.medName} supplied by wholesaler ID {m.wholeID}, name {m.wholesaler.wholesalerName}")
 
-# Charles Join Query
+#Charles Query
 patient_stmt = (
-    select(Prescription.presID, Patient.patZipCode)
-    .join(Patient, Prescription.patientID == Patient.patientID) 
+    select(Prescription)
+    .join(Prescription.patient)
     .where(Patient.patCityState == "Chicago, IL")
     .limit(5)
 )
-results = session.execute(patient_stmt).all()
-for presID, patZipCode in results:
-    print(f"Prescription {presID} will be delivered to Zip Code: {patZipCode}")
+results = session.scalars(patient_stmt).all()
+for p in results:
+    print(f"Prescription {p.presID} for zip code {p.patient.patZipCode}")
+
 
 
 
